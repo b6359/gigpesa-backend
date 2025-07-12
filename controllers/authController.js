@@ -7,8 +7,9 @@ const { sendWelcomeEmail, sendResetEmail } = require("../emailService");
 const path = require("path");
 const fs = require("fs");
 const csv = require("csv-parser");
+const Referrals = require("../models/Referrals");
 exports.register = async (req, res) => {
-  const { name, username, email, password, dob, gender, country, securityAnswer } = req.body;
+  const { name, username, email, password, dob, gender, country, securityAnswer, referral } = req.body;
   if (!name || !username || !email || !password || !dob || !gender || !country || !securityAnswer) {
     return res.status(400).json({ message: "All fields are required." });
   }
@@ -33,6 +34,11 @@ exports.register = async (req, res) => {
       return res.status(409).json({ message: "Email or Username already exists." });
     }
 
+    let referrer_user = await User.findByPk(referral);
+    if (!referrer_user) {
+      return res.status(404).json({ message: `Referral user is not found!` });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
@@ -45,6 +51,15 @@ exports.register = async (req, res) => {
       country,
       securityAnswer,
     });
+
+    if (referral) {
+      const referralEntry = await Referrals.create({
+        referrer_id: referrer_user.id,
+        referred_user_id: user.id,
+        earning: 1,
+        level: "Register"
+      });
+    }
 
     await sendWelcomeEmail(email, name);
 
@@ -83,8 +98,14 @@ exports.login = async (req, res) => {
     if (!match) return res.status(401).json({ message: "Invalid credentials." });
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "7d" });
-    res.json({ token, username: user.username });
+
+    return res.status(200).json({
+      message: `Welcome back ${user.name}`,
+      token,
+      user,
+    });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ message: "Login failed." });
   }
 };
@@ -156,7 +177,7 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-  
+
 exports.getJobs = async (req, res) => {
   const results = [];
   const csvPath = path.join(__dirname, "../JOBS STORE", "jobs.csv");

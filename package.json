@@ -4,7 +4,7 @@
   "description": "GigPesa Node.js Backend",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "keywords": [
     "gigpesa",
@@ -30,8 +30,10 @@
     "express-session": "^1.18.1",
     "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.1",
     "mysql2": "^3.4.3",
     "nodemailer": "^6.9.13",
+    "nodemon": "^3.1.10",
     "path": "^0.12.7",
     "sequelize": "^6.37.7"
   }
