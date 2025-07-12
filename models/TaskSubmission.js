@@ -8,7 +8,8 @@ const TaskSubmission = sequelize.define("task_submission", {
     proof: { type: DataTypes.STRING, defaultValue: null },
     status: { type: DataTypes.STRING, allowNull: false },
     earnings: { type: DataTypes.STRING, defaultValue: null },
-    submitted_at: { type: DataTypes.DATEONLY, defaultValue: Date.now() }
+    submitted_at: { type: DataTypes.DATEONLY, defaultValue: Date.now() },
+    device_type: { type: DataTypes.STRING, defaultValue: null },
 }, {
     tableName: 'task_submission',
     timestamps: true

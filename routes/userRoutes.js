@@ -2,17 +2,17 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
 const authMiddleware = require("../middleware/authMiddleware");
-const { submitTask, getTasks, submissionHistory } = require("../controllers/taskController");
+const { submitTask, getTasks, submissionHistory, addTask } = require("../controllers/taskController");
 const { getReferrals } = require("../controllers/referralController");
 const { createWithdraw, getWithdraws } = require("../controllers/withdrawalController");
 const { createNotification, getNotification, deleteNotification } = require("../controllers/notificationController");
-const upload = require("../middleware/multer");
 
 router.get("/dashboard/summary", authMiddleware, userController.dashboardSummary);
 router.get("/profile", authMiddleware, userController.userProfile);
 
+router.post('/task', authMiddleware, addTask);
 router.get("/tasks", authMiddleware, getTasks);
-router.post("/task/submit", authMiddleware, upload.single('proof'), submitTask);
+router.post("/task/submit", authMiddleware, submitTask);
 router.get("/tasks/history", authMiddleware, submissionHistory);
 
 router.get("/referrals", authMiddleware, getReferrals);

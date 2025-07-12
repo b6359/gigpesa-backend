@@ -72,3 +72,6 @@ ALTER TABLE `gigpesac_gigpesa`.`referrals`
 ADD INDEX `referrer_id_index` (`referrer_id` ASC) VISIBLE,
 ADD INDEX `referred_user_id_index` (`referred_user_id` ASC) VISIBLE;
 ;
+
+ALTER TABLE `gigpesac_gigpesa`.`task_submission` 
+ADD COLUMN `device_type` VARCHAR(255) NULL DEFAULT NULL AFTER `updatedAt`;

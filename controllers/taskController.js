@@ -3,13 +3,49 @@ const Task = require('../models/Tasks');
 const TaskSubmission = require('../models/TaskSubmission');
 const User = require('../models/User');
 
+exports.addTask = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { name, description, offer_url, status, expiration_date, country_codes, default_payout, category, device_type, id } = req.body;
+        if (!name || !description || !offer_url || !status || !expiration_date || !country_codes || !default_payout || !category || !device_type || !id) {
+            return res.status(400).json({ message: `All field must be required!` });
+        };
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: `User is not found!` });
+        };
+
+        const task = await Task.create({
+            id,
+            name,
+            description,
+            offer_url,
+            expiration_date,
+            country_codes,
+            category,
+            default_payout,
+            device_type,
+            status,
+        });
+
+        return res.status(200).json({
+            message: `New Task added successfully!`,
+            task
+        });
+    } catch (error) {
+        console.log(`Add task error: ${error}`);
+        return res.status(500).json({ message: `Failed to add task!` });
+    }
+}
+
 exports.submitTask = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { task_id, earnings, status } = req.body;
-        if (!task_id || !earnings || !status) {
+        const { task_id, earnings, status, proof, device_type } = req.body;
+        if (!task_id || !earnings || !status || !proof || !device_type) {
             return res.status(400).json({ message: `All fields are required.` });
-        }
+        };
 
         const user = await User.findByPk(userId);
         if (!user) {
@@ -20,18 +56,14 @@ exports.submitTask = async (req, res) => {
             return res.status(404).json({ message: `Task not found!` });
         }
 
-        let filename = null;
-        if (req.file) {
-            filename = req.file.filename;
-        };
-
         const taskSubmission = await TaskSubmission.create({
             user_id: user.id,
             task_id: task.id,
-            proof: filename,
+            proof,
             earnings,
             status,
             submitted_at: Date.now(),
+            device_type,
         });
 
         return res.status(200).json({
@@ -44,6 +76,7 @@ exports.submitTask = async (req, res) => {
                 status: taskSubmission.status,
                 earnings: taskSubmission.earnings,
                 submitted_at: taskSubmission.submitted_at,
+                device_type: taskSubmission.device_type,
             }
         });
     } catch (error) {
