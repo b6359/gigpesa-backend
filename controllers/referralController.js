@@ -13,8 +13,6 @@ exports.getReferrals = async (req, res) => {
             return res.status(404).json({ message: `User is not found!` });
         }
 
-        console.log(user.dataValues);
-
         const { count, rows: referrals } = await Referrals.findAndCountAll({
             where: { referrer_id: userId },
             offset: start,

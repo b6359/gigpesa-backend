@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 const Task = require('../models/Tasks');
 const TaskSubmission = require('../models/TaskSubmission');
 const User = require('../models/User');
+const Notifications = require('../models/Notifications');
 
 exports.addTask = async (req, res) => {
     try {
@@ -39,6 +40,38 @@ exports.addTask = async (req, res) => {
     }
 }
 
+exports.deleteTask = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { task_id, isDelete } = req.query;
+
+        if (!task_id) {
+            return res.status(400).json({ message: `All field must be required!` });
+        }
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: `User is not found!` });
+        }
+
+        const task = await Task.findByPk(task_id);
+        if (!task) {
+            return res.status(404).json({ message: `Task is not found!` });
+        }
+
+        if (isDelete == 'true') {
+            await task.destroy();
+        } else {
+            return res.status(200).json({ message: `Task is not deleted successfully!`, task });
+        }
+
+        return res.status(200).json({ message: `Task has been deleted successfully!`, task });
+    } catch (error) {
+        console.log(`Delete task error: ${error}`);
+        return res.status(500).json({ message: `Failed to delete a task!` });
+    }
+};
+
 exports.submitTask = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -64,6 +97,14 @@ exports.submitTask = async (req, res) => {
             status,
             submitted_at: Date.now(),
             device_type,
+        });
+
+        await Notifications.create({
+            user_id: user.id,
+            message: "New Task Submitted successfully!",
+            type: "Pop-Up",
+            visibility: "top",
+            isRead: false
         });
 
         return res.status(200).json({
@@ -178,4 +219,30 @@ exports.submissionHistory = async (req, res) => {
         console.log(`submissionHistory error: ${error}`);
         return res.status(500).json({ message: `Failed to get submission history!` });
     }
-}
+};
+
+exports.getTaskById = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { task_id } = req.params;
+
+        if (!task_id) {
+            return res.status(400).json({ message: `Task id must be required!` });
+        }
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: `User is not found!` });
+        }
+
+        const task = await Task.findByPk(task_id);
+        if (!task) {
+            return res.status(404).json({ message: `Task is not found!` });
+        }
+
+        return res.status(200).json({ message: `Task fetched successfully!`, task });
+    } catch (error) {
+        console.log(`Get task by id error: ${error}`);
+        return res.status(500).json({ message: `Failed to get specific task!` });
+    }
+};

@@ -44,7 +44,10 @@ exports.getNotification = async (req, res) => {
         }
 
         const notification = await Notifications.findAll({
-            where: { user_id: user.id, isRead: false }
+            where: { user_id: user.id, isRead: false },
+            order: [
+                ['createdAt', 'DEC']
+            ],
         });
 
         await Notifications.update(
@@ -96,4 +99,4 @@ exports.deleteNotification = async (req, res) => {
         console.log(`Notification delete error: ${error}`);
         return res.status(500).json({ message: `Failed to delete notification!` });
     }
-}
+};

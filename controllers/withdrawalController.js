@@ -1,3 +1,4 @@
+const Notifications = require("../models/Notifications");
 const User = require("../models/User");
 const Withdrawals = require("../models/withdrawals");
 
@@ -36,6 +37,14 @@ exports.createWithdraw = async (req, res) => {
         user.total_earnings = (currentEarning - numericAmount).toFixed(2);
         await user.save();
 
+        await Notifications.create({
+            user_id: user.id,
+            message: `Withdraw created successfully!`,
+            type: 'Pop-Up',
+            visibility: "top",
+            isRead: false
+        });
+
         return res.status(200).json({
             message: `Withdraw created successfully!`,
             withdrawData
@@ -59,15 +68,33 @@ exports.getWithdraws = async (req, res) => {
             return res.status(404).json({ message: `User is not found!` });
         }
 
-        const { count, rows: withdrawals } = await Withdrawals.findAndCountAll({
+        const { count, rows } = await Withdrawals.findAndCountAll({
             where: { user_id: user.id },
             offset: start,
             limit,
+            include: {
+                model: User,
+                as: 'user',
+                attributes: ['name', 'email', 'id']
+            }
         });
+
+        const withdrawals = rows.map(w => ({
+            id: w.id,
+            user_id: w.user_id,
+            amount: w.amount,
+            method: w.method,
+            status: w.status,
+            requested_at: w.requested_at,
+            createdAt: w.createdAt,
+            updatedAt: w.updatedAt,
+            name: user.name || null,
+            email: user.email || null
+        }));
 
         return res.status(200).json({
             message: `Withdrawal history fetched successfully!`,
-            totalPages: Math.ceil(count/limit),
+            totalPages: Math.ceil(count / limit),
             start,
             limit,
             withdrawals
