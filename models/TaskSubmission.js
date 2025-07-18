@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
+const Task = require('./Tasks');
 
 const TaskSubmission = sequelize.define("task_submission", {
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
@@ -15,5 +16,8 @@ const TaskSubmission = sequelize.define("task_submission", {
     tableName: 'task_submission',
     timestamps: true
 });
+
+TaskSubmission.belongsTo(Task, { foreignKey: 'task_id' });
+Task.hasMany(TaskSubmission, { foreignKey: 'task_id' });
 
 module.exports = TaskSubmission;

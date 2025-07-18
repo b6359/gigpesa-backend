@@ -1,5 +1,6 @@
 const { DataTypes, STRING } = require('sequelize');
 const { sequelize } = require('../config/db');
+const User = require('./User');
 
 const Referrals = sequelize.define('Referrals', {
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
@@ -21,5 +22,10 @@ const Referrals = sequelize.define('Referrals', {
         }
     ]
 });
+
+Referrals.belongsTo(User, { foreignKey: 'referrer_id', as: 'referrer' });
+Referrals.belongsTo(User, { foreignKey: 'referred_user_id', as: 'referredUser' });
+User.hasMany(Referrals, { foreignKey: 'referrer_id', as: 'referralsMade' });
+User.hasMany(Referrals, { foreignKey: 'referred_user_id', as: 'referralsReceived' });
 
 module.exports = Referrals;

@@ -17,6 +17,7 @@ router.post("/login", authLimiter, authController.login);
 router.post("/forgot-password", authLimiter, authController.forgotPassword);
 router.post("/reset-password", authController.resetPassword);
 router.get("/jobs", authMiddleware, authController.getJobs);
+router.post("/profileUpdate", authMiddleware, upload.single('profileImage'), authController.profileUpdate);
 
 
 module.exports = router;

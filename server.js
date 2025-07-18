@@ -33,6 +33,7 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/static', express.static(path.join(__dirname, 'public')));
 
 // Logging
 app.use((req, res, next) => {

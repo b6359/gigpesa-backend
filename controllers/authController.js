@@ -34,9 +34,12 @@ exports.register = async (req, res) => {
       return res.status(409).json({ message: "Email or Username already exists." });
     }
 
-    let referrer_user = await User.findByPk(referral);
-    if (!referrer_user) {
-      return res.status(404).json({ message: `Referral user is not found!` });
+    let referrer_user;
+    if (referral) {
+      referrer_user = await User.findByPk(referral);
+      if (!referrer_user) {
+        return res.status(404).json({ message: `Referral user is not found!` });
+      }
     }
 
     let profileImage;
@@ -59,13 +62,23 @@ exports.register = async (req, res) => {
     });
 
     if (referral) {
-      const referralEntry = await Referrals.create({
+      await Referrals.create({
         referrer_id: referrer_user.id,
         referred_user_id: user.id,
         earning: 1,
         level: "Register"
       });
-    }
+
+      await Notification.create(
+        {
+          user_id: referrer_user.id,
+          message: `New user registered using your referral link.`,
+          type: "Pop-Up",
+          visibility: "top",
+          isRead: false
+        }
+      );
+    };
 
     await sendWelcomeEmail(email, name);
 
@@ -200,3 +213,35 @@ exports.getJobs = async (req, res) => {
       res.status(500).json({ message: "Failed to read jobs file" });
     });
 };
+
+exports.profileUpdate = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { name, gender, country, dob } = req.body;
+
+    let user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: `User is not found!` });
+    }
+
+    const updateData = { name, gender, country, dob };
+
+    if (req.file) {
+      updateData.profileImage = req.file.filename;
+    }
+
+    await User.update(updateData,
+      { where: { id: user.id } },
+    );
+
+    const updatedUser = await User.findByPk(user.id)
+
+    return res.status(200).json({
+      message: `Profile was updated successfully.`,
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error("Profile Update Error: ", error);
+    return res.status(500).json({ message: `Failed to update your profile!` });
+  }
+}

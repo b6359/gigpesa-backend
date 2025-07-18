@@ -44,10 +44,10 @@ exports.getNotification = async (req, res) => {
         }
 
         const notification = await Notifications.findAll({
-            where: { user_id: user.id, isRead: false },
+            where: { user_id: user.id },
             order: [
-                ['createdAt', 'DEC']
-            ],
+                ['createdAt', 'DESC']
+            ]
         });
 
         await Notifications.update(

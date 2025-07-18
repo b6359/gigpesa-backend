@@ -92,7 +92,7 @@ exports.submitTask = async (req, res) => {
         let document;
         if (req.file) {
             document = req.file.filename;
-        }        
+        };
 
         const taskSubmission = await TaskSubmission.create({
             user_id: user.id,
@@ -124,7 +124,8 @@ exports.submitTask = async (req, res) => {
                 earnings: taskSubmission.earnings,
                 submitted_at: taskSubmission.submitted_at,
                 device_type: taskSubmission.device_type,
-                document: taskSubmission.document
+                document: taskSubmission.document,
+                task_name: task.name,
             }
         });
     } catch (error) {
@@ -212,7 +213,13 @@ exports.submissionHistory = async (req, res) => {
             limit,
             order: [
                 ['createdAt', 'DESC']
-            ]
+            ],
+            include: [
+                {
+                    model: Task,
+                    attributes: ['id', 'name', 'description'],
+                }
+            ],
         });
 
         return res.status(200).json({

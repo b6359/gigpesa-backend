@@ -16,7 +16,14 @@ exports.getReferrals = async (req, res) => {
         const { count, rows: referrals } = await Referrals.findAndCountAll({
             where: { referrer_id: userId },
             offset: start,
-            limit
+            limit,
+            include: [
+                {
+                    model: User,
+                    as: 'referredUser',
+                    attributes: ['username', 'name', 'email']
+                }
+            ]
         });
 
         return res.status(200).json({
