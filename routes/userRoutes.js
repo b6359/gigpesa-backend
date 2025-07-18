@@ -6,6 +6,7 @@ const { submitTask, getTasks, submissionHistory, addTask, deleteTask, getTaskByI
 const { getReferrals } = require("../controllers/referralController");
 const { createWithdraw, getWithdraws } = require("../controllers/withdrawalController");
 const { createNotification, getNotification, deleteNotification } = require("../controllers/notificationController");
+const { documentUpload } = require("../middleware/multer");
 
 router.get("/dashboard/summary", authMiddleware, userController.dashboardSummary);
 router.get("/profile", authMiddleware, userController.userProfile);
@@ -13,7 +14,7 @@ router.get("/profile", authMiddleware, userController.userProfile);
 router.post('/task', authMiddleware, addTask);
 router.delete('/task', authMiddleware, deleteTask);
 router.get("/tasks", authMiddleware, getTasks);
-router.post("/task/submit", authMiddleware, submitTask);
+router.post("/task/submit", authMiddleware, documentUpload.single('document'), submitTask);
 router.get("/tasks/history", authMiddleware, submissionHistory);
 router.get('/task/:task_id', authMiddleware, getTaskById);
 

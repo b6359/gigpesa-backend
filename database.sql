@@ -75,3 +75,9 @@ ADD INDEX `referred_user_id_index` (`referred_user_id` ASC) VISIBLE;
 
 ALTER TABLE `gigpesac_gigpesa`.`task_submission` 
 ADD COLUMN `device_type` VARCHAR(255) NULL DEFAULT NULL AFTER `updatedAt`;
+
+ALTER TABLE `gigpesac_gigpesa`.`users` 
+ADD COLUMN `profileImage` VARCHAR(2000) NULL DEFAULT NULL AFTER `updatedAt`;
+
+ALTER TABLE `gigpesac_gigpesa`.`task_submission` 
+ADD COLUMN `document` VARCHAR(2000) NULL DEFAULT NULL AFTER `device_type`;

@@ -89,6 +89,11 @@ exports.submitTask = async (req, res) => {
             return res.status(404).json({ message: `Task not found!` });
         }
 
+        let document;
+        if (req.file) {
+            document = req.file.filename;
+        }        
+
         const taskSubmission = await TaskSubmission.create({
             user_id: user.id,
             task_id: task.id,
@@ -97,6 +102,7 @@ exports.submitTask = async (req, res) => {
             status,
             submitted_at: Date.now(),
             device_type,
+            document
         });
 
         await Notifications.create({
@@ -118,6 +124,7 @@ exports.submitTask = async (req, res) => {
                 earnings: taskSubmission.earnings,
                 submitted_at: taskSubmission.submitted_at,
                 device_type: taskSubmission.device_type,
+                document: taskSubmission.document
             }
         });
     } catch (error) {

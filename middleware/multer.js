@@ -6,10 +6,24 @@ const uploadDir = path.join(__dirname, '../public/uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 };
+const documentDir = path.join(__dirname, '../public/documents');
+if (!fs.existsSync(documentDir)) {
+    fs.mkdirSync(documentDir, { recursive: true });
+};
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, path.join(__dirname, '../public/uploads'))
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '_' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, file.fieldname + '_' + uniqueSuffix + ext);
+    }
+});
+const documentStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../public/documents'))
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '_' + Math.round(Math.random() * 1E9);
@@ -36,4 +50,10 @@ const upload = multer({
     fileFilter
 });
 
-module.exports = upload;
+const documentUpload = multer({
+    storage: documentStorage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter
+});
+
+module.exports = { upload, documentUpload };

@@ -39,6 +39,11 @@ exports.register = async (req, res) => {
       return res.status(404).json({ message: `Referral user is not found!` });
     }
 
+    let profileImage;
+    if (req.file) {
+      profileImage = req.file.filename;
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
@@ -50,6 +55,7 @@ exports.register = async (req, res) => {
       gender,
       country,
       securityAnswer,
+      profileImage,
     });
 
     if (referral) {
@@ -79,6 +85,7 @@ exports.register = async (req, res) => {
         email: user.email,
         country: user.country,
         gender: user.gender,
+        profileImage: user.profileImage
       },
     });
   } catch (err) {

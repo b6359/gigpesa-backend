@@ -9,7 +9,7 @@ app.set("trust proxy", 1);
 
 
 // CORS setup
-const allowedOrigins = ["https://www.gigpesa.co.ke", "https://gigpesa.co.ke", "http://localhost:5173"];
+const allowedOrigins = ["https://www.gigpesa.co.ke", "https://gigpesa.co.ke", "http://localhost:5173", "http://localhost:3000"];
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) callback(null, true);

@@ -15,6 +15,7 @@ const User = sequelize.define("User", {
   // ✅ NEW FIELDS
   total_earnings: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0.00 },
   pending_payments: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0.00 },
+  profileImage: {type: DataTypes.STRING, defaultValue: null},
 
 }, {
   tableName: "users",
